@@ -23,3 +23,16 @@ fn parse_config(args: &[String]) -> Config {
 
   Config { query, file_name }
 }
+
+fn new(args: &[String]) -> Result<Config, &str> {
+  if args.len() < 3 {
+    return Err("Insufficient arguments");
+  }
+  let query = args[1].clone();
+  let file_name = args[2].clone();
+
+  Ok(Config {query, file_name})
+}
+
+
+
