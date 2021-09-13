@@ -8,8 +8,10 @@ fn main() {
   print!("Seeking {}", config.query);
   print!("In the file {}", config.file_name);
 
-  let contents = fs::read_to_string(config.file_name)
-    .expect("There was an unknown error");
+  if let Err(e) = run(config) {
+    print!("Application error: {}", e);
+    process::exit(1);
+  }
 }
 
 struct Config {
@@ -31,8 +33,15 @@ fn new(args: &[String]) -> Result<Config, &str> {
   let query = args[1].clone();
   let file_name = args[2].clone();
 
-  Ok(Config {query, file_name})
+  Ok(Config { query, file_name })
 }
 
+fn run(config: Config) -> Result<(), Box<dyn Error>> {
+  let contents = fs::read_to_string(config.file_name)?;
+
+  println!("With text:\n{}", contents);
+
+  Ok(()) // call run for side effects only
+}
 
 
