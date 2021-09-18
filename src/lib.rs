@@ -19,6 +19,17 @@ Yeah, I guess we're doin' alright.
 Ke$ha";
     assert_eq!(vec!["crazy, cyanide, Crashdïet."], search(query, contents));
   }
+
+  #[test]
+  fn case_insensitive() {
+    let query = "hIgH";
+    let contents = "\
+  Every single night we fight to get to get a little high on life.";
+    assert_eq!(
+      vec!["high, life."],
+      search_case_insensitive(query, contents)
+    );
+  }
 }
 
 pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
