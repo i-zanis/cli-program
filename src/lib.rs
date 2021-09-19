@@ -1,4 +1,4 @@
-use std::fs;
+use std::{fs, env};
 use std::error::Error;
 
 #[cfg(test)]
@@ -37,6 +37,24 @@ pub struct Config {
   pub file_name: String,
   pub case_sensitive: bool,
 }
+
+impl Config {
+  pub fn new(args: &[String]) -> Result<Config, &str> {
+    if args.len() < 3 {
+      return Err("Insufficient amount of arguments");
+    }
+    let query = args[1].clone();
+    let file_name = args[2].clone();
+
+    let case_sensitive = env::var("CASE_INSENSITIVE").is_err();
+
+    Ok(Config {
+      query,
+      file_name,
+      case_sensitive,
+    })
+  }
+}
 pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
   for line in contents.lines() {
     if line.contains(query) {
@@ -49,16 +67,21 @@ pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
 pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
   let contents = fs::read_to_string(config.file_name)?;
 
-  for line in search(&config.query, &contents) {
-    println!("{}", line);
+  let results = if config.case_sensitive {
+    search(&config.query, &contents)
+  } else {
+    search_case_insensitive(&config.query, &contents)
+  };
+  for line in results {
+    print("{}", line);
   }
   Ok(())
 }
 
-pub fn search_case_insensitive<'a> (
+pub fn search_case_insensitive<'a>(
   query: &str,
   contents: &'a str,
-)-> Vec<&'a str> {
+) -> Vec<&'a str> {
   let query = query.to_lowercase();
   let mut results = Vec::new();
 
